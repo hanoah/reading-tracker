@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Reading Tracker</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #606C38;
+            --color-primary-dark: #283618;
+            --color-light: #FEFAE0;
+            --color-accent: #DDA15E;
+            --color-accent-dark: #BC6C25;
+        }
+        
+        body {
+            background-color: var(--color-light);
+            padding: 1rem;
+        }
+        
+        .card {
+            transition: transform 0.2s;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 12px;
+        }
+        
+        .stats-card {
+            border-left: 4px solid var(--color-primary);
+        }
+        
+        .progress {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(45deg, var(--color-accent), var(--color-accent-dark));
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: width 0.6s ease;
+        }
+        
+        .progress-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header {
+            border-radius: 12px 12px 0 0 !important;
+        }
+        
+        .badge {
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+            white-space: normal;
+            text-align: center;
+        }
+        
+        .badge.bg-primary {
+            background: linear-gradient(45deg, var(--color-primary), var(--color-primary-dark)) !important;
+        }
+        
+        .badge.bg-success {
+            background: linear-gradient(45deg, var(--color-accent), var(--color-accent-dark)) !important;
+        }
+        
+        .book-title {
+            font-weight: 500;
+            color: #2c3e50;
+            display: block;
+        }
+        
+        .stats-number {
+            background: linear-gradient(45deg, var(--color-accent), var(--color-accent-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+            font-size: 2rem;
+        }
+        
+        .status-message {
+            padding: 0.5rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            font-weight: 500;
+        }
+        
+        .status-message div {
+            margin-top: 0.25rem;
+            line-height: 1.4;
+        }
+        
+        .status-message.bg-success-light {
+            background-color: rgba(96, 108, 56, 0.1);
+            color: var(--color-primary-dark);
+        }
+        
+        .status-message.bg-danger-light {
+            background-color: rgba(221, 161, 94, 0.1);
+            color: var(--color-accent-dark);
+        }
+        
+        .log-form {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        
+        .log-form input {
+            width: 80px;
+            text-align: center;
+        }
+        
+        .loading-state, .normal-state {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .d-none {
+            display: none !important;
+        }
+        
+        .app-title {
+            background: linear-gradient(45deg, var(--color-accent), var(--color-accent-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .app-title i {
+            background: linear-gradient(45deg, var(--color-accent), var(--color-accent-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .btn-primary {
+            background: var(--color-accent);
+            border-color: var(--color-accent-dark);
+        }
+        
+        .btn-primary:hover {
+            background: var(--color-accent-dark);
+            border-color: var(--color-accent-dark);
+        }
+        
+        .text-primary {
+            color: var(--color-accent) !important;
+        }
+        
+        .bg-primary {
+            background: var(--color-accent) !important;
+        }
+        
+        .card-header.bg-primary {
+            background: var(--color-accent) !important;
+        }
+        
+        .card-header.bg-success {
+            background: var(--color-primary) !important;
+        }
+        
+        .table > :not(caption) > * > * {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        tr {
+            background: white;
+            margin-bottom: 1rem;
+        }
+        
+        tr:not(:last-child) {
+            border-bottom: 8px solid var(--color-light);
+        }
+        
+        .table > tbody {
+            vertical-align: middle;
+        }
+        
+        .mobile-stack {
+            padding: 1.5rem !important;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            .container {
+                padding: 0;
+            }
+            .display-4 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+            .card {
+                margin-bottom: 0.5rem;
+            }
+            .table {
+                font-size: 0.9rem;
+            }
+            .progress-container {
+                margin-top: 0.5rem;
+            }
+            td {
+                padding: 0.5rem !important;
+            }
+            .mobile-stack {
+                display: flex;
+                flex-direction: column;
+            }
+            .mobile-meta {
+                font-size: 0.8rem;
+                color: #6c757d;
+                margin-top: 0.25rem;
+            }
+            .log-form {
+                flex-wrap: wrap;
+            }
+            .log-form button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col d-flex justify-content-between align-items-center">
+                <h1 class="app-title">
+                    <i class="bi bi-book-half"></i>
+                    Reading Tracker
+                </h1>
+                <button class="btn btn-primary" onclick="updateTables()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-2 mb-3" id="statsRow">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Books Section -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">
+                    <i class="bi bi-books"></i> Reading List 📚
+                </h2>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0" id="booksTable">
+                        <thead class="table-light">
+                            <tr class="d-none d-md-table-row">
+                                <th>Book Title</th>
+                                <th>Pages</th>
+                                <th>Finish Date</th>
+                                <th>Daily Goal</th>
+                                <th>Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h2 class="h5 mb-0">
+                    <i class="bi bi-graph-up"></i> Reading Progress 📈
+                </h2>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0" id="progressTable">
+                        <thead class="table-light">
+                            <tr class="d-none d-md-table-row">
+                                <th>Book Title</th>
+                                <th>Date</th>
+                                <th>Pages</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyotA46Q9eeMecq0wsc4VCmYLnU_u_e-6yVVTGBaOgWPQS41dVpRVfTVMhc3BZlDmk-2A/exec';
+
+        async function fetchData(sheet) {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=fetch&sheet=${sheet}`);
+                const text = await response.text();
+                console.log(`${sheet} response:`, text);
+                const result = JSON.parse(text);
+                return result.data;
+            } catch (error) {
+                console.error(`Error fetching ${sheet}:`, error);
+                return [];
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'numeric',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        function formatMobileData(pages, date, goal) {
+            return `${pages} pages - Due ${formatDate(date)} - ${Math.round(goal)} pages/day`;
+        }
+
+        function formatProgressData(date, pages) {
+            return `${formatDate(date)} - ${pages} pages`;
+        }
+
+        function calculateProgress(bookTitle, books, progress) {
+            const book = books.find(b => b[0] === bookTitle);
+            if (!book) return 0;
+            
+            const totalPages = parseInt(book[1]);
+            const pagesRead = progress
+                .filter(p => p[0] === bookTitle)
+                .reduce((sum, entry) => sum + parseInt(entry[2]), 0);
+            
+            return Math.min(100, Math.round((pagesRead / totalPages) * 100));
+        }
+
+        function calculateReadingStatus(bookTitle, pages, date, goal, progress, startDate, todayTargetPage) {
+            const pagesRead = progress
+                .filter(p => p[0] === bookTitle)
+                .reduce((sum, entry) => sum + parseInt(entry[2]), 0);
+            
+            // If book is done
+            if (pagesRead >= pages) {
+                return { 
+                    status: 'success', 
+                    message: 'All Done! 🎉 Great job! ⭐️',
+                    pagesRead 
+                };
+            }
+
+            console.log(`${bookTitle} calculations:`, {
+                startDate,
+                goal,
+                todayTargetPage,
+                pagesRead,
+                totalPages: pages
+            });
+
+            // Determine if on track
+            if (pagesRead >= todayTargetPage) {
+                return { 
+                    status: 'success', 
+                    message: `On Track! 🌟<br>Today you should be on page ${todayTargetPage}`,
+                    pagesRead 
+                };
+            }
+            
+            // Need to catch up
+            return { 
+                status: 'danger',
+                message: `Need to catch up! ⚠️<br>Today you should be on page ${todayTargetPage}`,
+                pagesRead 
+            };
+        }
+
+        function updateStats(books, progress) {
+            const totalBooks = books.length - 1;
+            
+            // Calculate total pages read by getting the latest page for each book
+            const bookProgress = {};
+            progress.slice(1).forEach(([book, date, pages]) => {
+                if (!bookProgress[book]) bookProgress[book] = 0;
+                bookProgress[book] += parseInt(pages);
+            });
+            const totalPagesRead = Object.values(bookProgress).reduce((sum, pages) => sum + pages, 0);
+            
+            const totalPages = books.slice(1).reduce((sum, book) => sum + parseInt(book[1]), 0);
+            const overallProgress = Math.round((totalPagesRead / totalPages) * 100);
+
+            const statsHtml = `
+                <div class="col-4">
+                    <div class="card stats-card h-100">
+                        <div class="card-body text-center p-2">
+                            <div class="stats-number">${totalBooks}</div>
+                            <small class="text-muted">Books 📚</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card stats-card h-100">
+                        <div class="card-body text-center p-2">
+                            <div class="stats-number">${totalPagesRead}</div>
+                            <small class="text-muted">Pages 📖</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card stats-card h-100">
+                        <div class="card-body text-center p-2">
+                            <div class="stats-number">${overallProgress}%</div>
+                            <small class="text-muted">Complete ✨</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('statsRow').innerHTML = statsHtml;
+        }
+
+        async function updateTables() {
+            const [books, progress] = await Promise.all([fetchData('Books'), fetchData('Progress')]);
+            
+            updateStats(books, progress);
+
+            const isMobile = window.innerWidth < 768;
+            
+            // Update books table
+            const booksBody = document.querySelector('#booksTable tbody');
+            booksBody.innerHTML = books.slice(1).map(([title, pages, date, goal, startDate, todayTargetPage]) => {
+                const progressPercent = calculateProgress(title, books, progress);
+                const status = calculateReadingStatus(title, pages, date, goal, progress.slice(1), startDate, parseInt(todayTargetPage));
+                const statusClass = status.status === 'success' ? 'text-accent' : 'text-primary';
+                const statusBg = status.status === 'success' ? 'bg-primary-light' : 'bg-accent-light';
+                
+                if (isMobile) {
+                    return `
+                        <tr>
+                            <td class="mobile-stack">
+                                <div>
+                                    <i class="bi bi-book text-primary"></i>
+                                    <span class="book-title">${title} 📚</span>
+                                </div>
+                                <div class="mobile-meta">
+                                    ${formatMobileData(pages, date, goal)}
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-label">
+                                        <span>Progress: ${status.pagesRead} of ${pages} pages</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-${status.status === 'success' ? 'primary' : 'accent'}" role="progressbar" 
+                                             style="width: ${progressPercent}%" 
+                                             aria-valuenow="${progressPercent}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="status-message ${statusBg}">
+                                    <div class="${statusClass}">${status.message}</div>
+                                </div>
+                                <form class="log-form" onsubmit="logProgress(event, '${title}', ${status.pagesRead})">
+                                    <span>I'm on page</span>
+                                    <input type="number" class="form-control form-control-sm" 
+                                           required min="${status.pagesRead + 1}" max="${pages}"
+                                           placeholder="Page #">
+                                    <button type="submit" class="btn btn-primary btn-sm" id="submit-${title.replace(/\s+/g, '-')}">
+                                        <span class="normal-state">
+                                            <i class="bi bi-journal-check"></i> Log Progress 📖
+                                        </span>
+                                        <span class="loading-state d-none">
+                                            <span class="spinner-border spinner-border-sm text-accent" role="status" aria-hidden="true"></span>
+                                            Updating... ⏳
+                                        </span>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    return `
+                        <tr>
+                            <td>
+                                <i class="bi bi-book text-primary"></i>
+                                <span class="book-title ms-2">${title} 📚</span>
+                            </td>
+                            <td>${status.pagesRead} of ${pages}</td>
+                            <td>${formatDate(date)}</td>
+                            <td>
+                                <span class="badge bg-primary">${Math.round(goal)} pages/day</span>
+                            </td>
+                            <td style="width: 200px">
+                                <div class="progress-label">
+                                    <small class="${statusClass}">
+                                        ${status.message}
+                                    </small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-${status.status === 'success' ? 'primary' : 'accent'}" role="progressbar" 
+                                         style="width: ${progressPercent}%" 
+                                         aria-valuenow="${progressPercent}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }).join('');
+
+            // Update progress table
+            const progressBody = document.querySelector('#progressTable tbody');
+            const recentProgress = progress.slice(1).sort((a, b) => new Date(b[1]) - new Date(a[1])).slice(0, 10);
+            progressBody.innerHTML = recentProgress.map(([book, date, pages]) => {
+                if (isMobile) {
+                    return `
+                        <tr>
+                            <td class="mobile-stack">
+                                <div>
+                                    <i class="bi bi-book text-success"></i>
+                                    <span class="book-title">${book}</span>
+                                </div>
+                                <div class="mobile-meta">
+                                    ${formatProgressData(date, pages)}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    return `
+                        <tr>
+                            <td>
+                                <i class="bi bi-book text-success"></i>
+                                <span class="book-title ms-2">${book}</span>
+                            </td>
+                            <td>${formatDate(date)}</td>
+                            <td>
+                                <span class="badge bg-success">${pages} pages</span>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }).join('');
+        }
+
+        async function logProgress(event, bookTitle, lastPage) {
+            event.preventDefault();
+            const form = event.target;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const normalState = submitButton.querySelector('.normal-state');
+            const loadingState = submitButton.querySelector('.loading-state');
+            
+            // Show loading state
+            normalState.classList.add('d-none');
+            loadingState.classList.remove('d-none');
+            submitButton.disabled = true;
+            
+            const currentPage = parseInt(form.querySelector('input').value);
+            const pagesRead = currentPage - lastPage;
+            
+            if (pagesRead <= 0) {
+                alert('Please enter a page number higher than your last logged page.');
+                // Reset button state
+                normalState.classList.remove('d-none');
+                loadingState.classList.add('d-none');
+                submitButton.disabled = false;
+                return;
+            }
+            
+            try {
+                const data = [bookTitle, new Date().toISOString(), pagesRead];
+                const params = new URLSearchParams({
+                    action: 'append',
+                    sheet: 'Progress',
+                    data: JSON.stringify(data)
+                });
+                
+                const response = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
+                    redirect: 'follow'
+                });
+                
+                const text = await response.text();
+                
+                if (text.includes('success":true')) {
+                    form.reset();
+                    await updateTables();
+                } else {
+                    throw new Error('Failed to log progress');
+                }
+            } catch (error) {
+                console.error('Error logging progress:', error);
+                alert('Failed to log progress. Please try again.');
+            } finally {
+                // Reset button state
+                normalState.classList.remove('d-none');
+                loadingState.classList.add('d-none');
+                submitButton.disabled = false;
+            }
+        }
+
+        // Initial load
+        updateTables();
+
+        // Update on resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            // Debounce resize events
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(updateTables, 250);
+        });
+    </script>
+</body>
+</html>
