@@ -17,8 +17,14 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Create config.js
+        env:
+          SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
         run: |
-          echo 'const CONFIG = { SCRIPT_URL: "${{ secrets.APPS_SCRIPT_URL }}" };' > config.js
+          cat > config.js << EOL
+          const CONFIG = {
+            SCRIPT_URL: "${SCRIPT_URL}"
+          };
+          EOL
           cat config.js
           
       - name: Setup Pages
