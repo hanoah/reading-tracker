@@ -1,81 +1,50 @@
-# Reading Progress Tracker
+# 📚 Reading Tracker
 
-A simple, serverless web application that helps you track your reading progress using Google Sheets as a backend.
+A modern web application to track your reading progress and goals using Google Sheets as a backend. Track multiple books, set daily reading goals, and monitor your progress with a beautiful, responsive interface.
 
-## Features
-- Track books and reading goals
-- Log daily reading progress
-- Calculate if you're on track with your reading goals
-- View reading statistics and progress
-- Responsive design that works on both desktop and mobile
-- Beautiful, modern UI with an earthy color scheme
+## ✨ Features
 
-## Setup
+- 📖 Track multiple books simultaneously
+- 📊 Visual progress bars for each book
+- 🎯 Daily reading goals with progress tracking
+- 📱 Responsive design for mobile and desktop
+- 🎨 Modern UI with an earthy color palette
+- ☁️ Google Sheets integration for data storage
 
-1. Create a new Google Sheet with two tabs:
+## 🚀 Getting Started
 
-**Tab 1: Books**
-| Book Title | Total Pages | Finish Date | Daily Goal | Start Date | Today Target Page |
-|------------|-------------|-------------|------------|------------|-------------------|
-| Example    | 300        | 2024-02-01  | =ROUNDUP(B2/(C2-TODAY()),0) | =TODAY() | =ROUNDUP((TODAY()-E2)*D2,0) |
-
-**Tab 2: Progress**
-| Book Title | Date | Pages Read |
-|------------|------|------------|
-| Example    | 2024-01-01 | 50 |
-
-2. Set up Google Apps Script:
-   - In your Google Sheet, go to Extensions > Apps Script
-   - Create a new script and paste the following code:
+1. Create a copy of the Google Sheet template (coming soon)
+2. Deploy the Google Apps Script to your sheet
+3. Copy your script URL to `config.js`:
    ```javascript
-   function doGet(e) {
-     const action = e.parameter.action;
-     const sheet = e.parameter.sheet;
-     
-     if (action === 'fetch') {
-       const data = SpreadsheetApp.getActiveSpreadsheet()
-         .getSheetByName(sheet)
-         .getDataRange()
-         .getValues();
-       return ContentService.createTextOutput(JSON.stringify({
-         success: true,
-         data: data
-       })).setMimeType(ContentService.MimeType.JSON);
-     }
-     
-     if (action === 'append') {
-       const data = JSON.parse(e.parameter.data);
-       SpreadsheetApp.getActiveSpreadsheet()
-         .getSheetByName(sheet)
-         .appendRow(data);
-       return ContentService.createTextOutput(JSON.stringify({
-         success: true
-       })).setMimeType(ContentService.MimeType.JSON);
-     }
-   }
+   const CONFIG = {
+       SCRIPT_URL: 'YOUR_GOOGLE_APPS_SCRIPT_URL'
+   };
    ```
-   - Deploy as a web app:
-     - Click "Deploy" > "New deployment"
-     - Choose "Web app"
-     - Set "Execute as" to "Me"
-     - Set "Who has access" to "Anyone"
-     - Click "Deploy"
-     - Copy the web app URL
+4. Open `index.html` in your browser or deploy to GitHub Pages
 
-3. Update the app:
-   - Open `index.html`
-   - Replace the `SCRIPT_URL` value with your Google Apps Script web app URL
+## 💻 Local Development
 
-## Usage
+1. Clone the repository
+2. Copy `config.sample.js` to `config.js` and add your Google Apps Script URL
+3. Start a local server:
+   ```bash
+   python3 -m http.server 8000
+   ```
+4. Open http://localhost:8000 in your browser
 
-Simply open `index.html` in your web browser. No server required!
+## 🎨 Color Palette
 
-The app will:
-- Show your reading statistics
-- Display your book list with progress bars
-- Allow you to log your reading progress
-- Calculate if you're on track with your reading goals
-- Show your recent reading history
+The app uses a modern, earthy color scheme:
+- Primary: #606C38
+- Primary Dark: #283618
+- Light: #FEFAE0
+- Accent: #DDA15E
+- Accent Dark: #BC6C25
+
+## 📱 Screenshots
+
+Coming soon!
 
 ## Technologies Used
 - HTML/CSS/JavaScript
